@@ -5,6 +5,8 @@ import { createBrowserHistory } from "history";
 import { useUserAuth } from "../context/authContext";
 import { getUsername } from "../lib/firebase";
 
+// TODO: Set the display name to the username
+
 const Signup = () => {
   // displayName in the auth
   const [username, setUsername] = useState("");
@@ -15,13 +17,13 @@ const Signup = () => {
   const { signup } = useUserAuth();
   const isInvalid = password === "" || emailAddress === "";
 
-  let history = createBrowserHistory();
+  // let history = createBrowserHistory();
 
   let navigate = useNavigate();
 
   // const { firebase } = useContext(FirebaseContext);
 
-  history.listen(({ location, action }) => {});
+  // history.listen(({ location, action }) => {});
 
   const handleSignup = async (event) => {
     event.preventDefault();
@@ -33,7 +35,7 @@ const Signup = () => {
 
     if (!usernameExists) {
       try {
-        await signup(emailAddress, password);
+        await signup(username, emailAddress, password);
         navigate(ROUTES.DASHBOARD);
       } catch (error) {
         console.log(`Error creating a new user: ${error}`);

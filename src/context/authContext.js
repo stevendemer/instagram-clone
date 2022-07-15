@@ -4,6 +4,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  updateProfile,
 } from "firebase/auth";
 import { auth } from "../lib/firebase";
 
@@ -16,32 +17,26 @@ export function UserAuthContextProvider({ children }) {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
-  function signup(email, password) {
-    return createUserWithEmailAndPassword(auth, email, password);
+  // ! Update profile not working
+  function signup(username, email, password) {
+    return createUserWithEmailAndPassword(auth, email, password)
+      .then((result) => {
+        updateProfile({
+          displayName: username,
+        });
+        return result;
+      })
+      .catch((err) => console.log(err));
   }
 
   function logout() {
     return signOut(auth);
   }
 
-  function getLoggedIn() {
-    let currentUser = {};
-    const loggedUser = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // user is logged in
-        currentUser = user;
-      } else {
-        alert("User is signed out");
-      }
-    });
-    console.log(currentUser);
-    return currentUser;
-  }
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       console.log(
-        `Email: ${currentUser.email} and User ID: ${currentUser.uid}`
+        `Display name: ${currentUser.displayName} - Email: ${currentUser.email} and User ID: ${currentUser.uid}`
       );
       setUser(currentUser);
     });
