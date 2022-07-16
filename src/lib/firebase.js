@@ -62,7 +62,7 @@ export async function getUsername(username) {
     snapshot.docs.forEach((doc) => {
       user.push({ ...doc.data(), id: doc.id });
     });
-    console.log(`User called ${username} exists !`);
+    // console.log(`User called ${username} exists !`);
     return user.length > 0;
   });
 }

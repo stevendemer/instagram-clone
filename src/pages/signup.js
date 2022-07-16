@@ -1,5 +1,5 @@
 import * as ROUTES from "../constants/routes";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createBrowserHistory } from "history";
 import { useUserAuth } from "../context/authContext";
@@ -14,7 +14,7 @@ const Signup = () => {
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { signup } = useUserAuth();
+  const { signup, user } = useUserAuth();
   const isInvalid = password === "" || emailAddress === "";
 
   // let history = createBrowserHistory();
@@ -30,12 +30,11 @@ const Signup = () => {
 
     const usernameExists = await getUsername(username);
 
-    // debugging
     // getCurrentUser();
 
     if (!usernameExists) {
       try {
-        await signup(username, emailAddress, password);
+        await signup(emailAddress, password);
         navigate(ROUTES.DASHBOARD);
       } catch (error) {
         console.log(`Error creating a new user: ${error}`);

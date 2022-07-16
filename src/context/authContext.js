@@ -6,38 +6,56 @@ import {
   onAuthStateChanged,
   updateProfile,
 } from "firebase/auth";
-import { auth } from "../lib/firebase";
+import {
+  doc,
+  setDoc,
+  getDoc,
+  collection,
+  where,
+  addDoc,
+} from "firebase/firestore";
+import { auth, db } from "../lib/firebase";
+import { Timestamp } from "firebase/firestore";
 
 const userAuthContext = createContext();
 
 export function UserAuthContextProvider({ children }) {
   const [user, setUser] = useState({});
 
-  function login(email, password) {
-    return signInWithEmailAndPassword(auth, email, password);
+  async function login(email, password) {
+    return await signInWithEmailAndPassword(auth, email, password);
   }
 
   // ! Update profile not working
-  function signup(username, email, password) {
-    return createUserWithEmailAndPassword(auth, email, password)
-      .then((result) => {
-        updateProfile({
-          displayName: username,
-        });
-        return result;
+  async function signup(email, password) {
+    const colRef = collection(db, "users");
+    console.log(`Collection ref ${colRef}`);
+    createUserWithEmailAndPassword(auth, email, password)
+      .then((userCreds) => {
+        const user = userCreds.user;
+        // user is signed in
+        console.log(
+          `User name: ${user.displayName} and email ${user.email} and id ${user.uid}`
+        );
       })
-      .catch((err) => console.log(err));
+      .catch((error) => {
+        console.debug(
+          `Error Code: ${error.code} and message is ${error.message}`
+        );
+      });
   }
 
   function logout() {
-    return signOut(auth);
+    return signOut(auth)
+      .then(() => console.log("User logged out successfully !"))
+      .catch((error) => console.log(`Error logging out ${error}`));
   }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      console.log(
-        `Display name: ${currentUser.displayName} - Email: ${currentUser.email} and User ID: ${currentUser.uid}`
-      );
+      // console.log(
+      //   `Display name: ${currentUser.displayName} - Email: ${currentUser.email} and User ID: ${currentUser.uid}`
+      // );
       setUser(currentUser);
     });
     return () => {
