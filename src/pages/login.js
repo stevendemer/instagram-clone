@@ -1,12 +1,5 @@
-import { createBrowserHistory } from "history";
 import { useContext, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import FirebaseContext from "../context/firebase";
-import {
-  getUsername,
-  signWithEmailAndPassword,
-  readFirestore,
-} from "../lib/firebase";
 import * as ROUTES from "../constants/routes";
 import { useUserAuth } from "../context/authContext";
 import { useNavigate } from "react-router-dom";
@@ -19,8 +12,6 @@ const Login = () => {
   let navigate = useNavigate();
   const isInvalid = password === "" || emailAddress === "";
 
-  let history = createBrowserHistory();
-
   const handleLogin = async (event) => {
     event.preventDefault();
 
@@ -31,11 +22,11 @@ const Login = () => {
       // history.push(ROUTES.DASHBOARD);
     } catch (error) {
       // the form clears up
+      setEmailAddress("");
+      setPassword("");
       setError(error.message);
     }
   };
-
-  history.listen(({ location, action }) => {});
 
   useEffect(() => {
     document.title = "Login - Instagram";

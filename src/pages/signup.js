@@ -16,34 +16,9 @@ const Signup = () => {
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { signup } = useUserAuth();
   const isInvalid = password === "" || emailAddress === "";
 
-  // let history = createBrowserHistory();
-
   let navigate = useNavigate();
-
-  // const { firebase } = useContext(FirebaseContext);
-
-  // history.listen(({ location, action }) => {});
-
-  // const handleSignup = async (event) => {
-  //   event.preventDefault();
-
-  //   const usernameExists = await getUsername(username);
-
-  //   // getCurrentUser();
-
-  //   if (!usernameExists) {
-  //     try {
-  //       await signup(emailAddress, password);
-  //       navigate(ROUTES.DASHBOARD);
-  //     } catch (error) {
-  //       console.log(`Error creating a new user: ${error}`);
-  //       setError(error.message);
-  //     }
-  //   }
-  // };
 
   const handleSignup = async (event) => {
     event.preventDefault();

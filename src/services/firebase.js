@@ -25,8 +25,17 @@ export async function doesUsernameExist(username) {
 }
 
 export async function getUserById(userID) {
-  const querySnapshot = await getDocs(collection(db, "users"));
-  querySnapshot.forEach((doc) => {
-    console.log(`Document id ${doc.id} and doc data is ${{ ...doc.data() }}`);
-  });
+  const usersRef = collection(db, "users");
+
+  // create query against collection
+  const q = query(usersRef, where("userId", "==", userID));
+
+  const querySnapshot = await getDocs(q);
+
+  const foundUser = querySnapshot.forEach((doc) => ({
+    ...doc.data(),
+    docId: doc.id,
+  }));
+
+  return foundUser;
 }
