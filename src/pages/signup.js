@@ -1,11 +1,13 @@
 import * as ROUTES from "../constants/routes";
 import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createBrowserHistory } from "history";
 import { useUserAuth } from "../context/authContext";
-import { getUsername } from "../lib/firebase";
+import { auth, getUsername } from "../lib/firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { db } from "../lib/firebase";
+import { addDoc, Timestamp, collection } from "firebase/firestore";
 
-// TODO: Set the display name to the username
+// Added the new user to the firestore
 
 const Signup = () => {
   // displayName in the auth
@@ -14,7 +16,7 @@ const Signup = () => {
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { signup, user } = useUserAuth();
+  const { signup } = useUserAuth();
   const isInvalid = password === "" || emailAddress === "";
 
   // let history = createBrowserHistory();
@@ -25,21 +27,64 @@ const Signup = () => {
 
   // history.listen(({ location, action }) => {});
 
+  // const handleSignup = async (event) => {
+  //   event.preventDefault();
+
+  //   const usernameExists = await getUsername(username);
+
+  //   // getCurrentUser();
+
+  //   if (!usernameExists) {
+  //     try {
+  //       await signup(emailAddress, password);
+  //       navigate(ROUTES.DASHBOARD);
+  //     } catch (error) {
+  //       console.log(`Error creating a new user: ${error}`);
+  //       setError(error.message);
+  //     }
+  //   }
+  // };
+
   const handleSignup = async (event) => {
     event.preventDefault();
 
     const usernameExists = await getUsername(username);
 
-    // getCurrentUser();
-
+    // firebase checks only for unique email
     if (!usernameExists) {
       try {
-        await signup(emailAddress, password);
+        const createdResult = await createUserWithEmailAndPassword(
+          auth,
+          emailAddress,
+          password
+        );
+
+        // update the display name
+        await updateProfile(createdResult.user, {
+          displayName: username,
+        });
+
+        // create a document to the firestore
+        const docRef = await addDoc(collection(db, "users"), {
+          userId: createdResult.user.uid,
+          username: username.toLowerCase(),
+          fullName,
+          emailAddress: emailAddress.toLowerCase(),
+          following: ["2"],
+          followers: [],
+          dateCreated: Timestamp.now(),
+        });
+
         navigate(ROUTES.DASHBOARD);
       } catch (error) {
-        console.log(`Error creating a new user: ${error}`);
+        setFullname("");
+        setEmailAddress("");
+        setPassword("");
         setError(error.message);
       }
+    } else {
+      setUsername("");
+      setError("The username is already taken, please try another one !");
     }
   };
 
@@ -50,7 +95,7 @@ const Signup = () => {
   return (
     <div className="container flex mx-auto max-w-screen-md items-center h-screen">
       <div className="flex w-3/5">
-        <img src="/images/iphone-with-profile.jpg" alt="iphone with image" />
+        <img src="/images/iphone-with-profile.jpg" alt="iphone  " />
       </div>
       <div className="flex flex-col w-2/5">
         <div className="flex flex-col items-center bg-white p-4 border rounded border-gray-primary">

@@ -8,9 +8,12 @@ import {
   getDoc,
 } from "firebase/firestore";
 
+// collection ref
+const usersRef = collection(db, "users");
+
 export async function doesUsernameExist(username) {
-  const docRef = doc(db, "users", username);
   const docSnap = await getDoc(docRef);
+  const docRef = doc(db, "users", username);
 
   if (docSnap.exists()) {
     console.log(`Document data: ${docSnap.data()}`);
@@ -19,4 +22,11 @@ export async function doesUsernameExist(username) {
   } else {
     console.log("No such document !");
   }
+}
+
+export async function getUserById(userID) {
+  const querySnapshot = await getDocs(collection(db, "users"));
+  querySnapshot.forEach((doc) => {
+    console.log(`Document id ${doc.id} and doc data is ${{ ...doc.data() }}`);
+  });
 }

@@ -29,7 +29,6 @@ export function UserAuthContextProvider({ children }) {
   // ! Update profile not working
   async function signup(email, password) {
     const colRef = collection(db, "users");
-    console.log(`Collection ref ${colRef}`);
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCreds) => {
         const user = userCreds.user;
